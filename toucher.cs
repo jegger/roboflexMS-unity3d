@@ -100,10 +100,20 @@ public class toucher : MonoBehaviour {
 		//ignore touches on GUI elements
 		if (cube_selection_is_open==false){
 			if (touch.x<Screen.width-20 & touch.x>Screen.width-170 & touch.y>Screen.height-70 & touch.y<Screen.height-20){
+				if (active_cube!=null){
+					active_cube.renderer.material=normal_cube_material;
+				}
+				active_cube=null;
+				cube_active=false;
 				return;
 			}
 		}else{
 			if (touch.x<100 | touch.x>Screen.width-100){
+				if (active_cube!=null){
+					active_cube.renderer.material=normal_cube_material;
+				}
+				active_cube=null;
+				cube_active=false;
 				return;
 			}
 		}
