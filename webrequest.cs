@@ -46,10 +46,10 @@ public class webrequest : MonoBehaviour{
 			
 			//Create cube string
 			var j_x = go.transform.position.x;
-			var j_y = go.transform.position.y-0.5;
-			var j_z = go.transform.position.z;
+			var j_z = go.transform.position.y-0.5;
+			var j_y = go.transform.position.z;
 			var j_typ = typ;
-			var j_rot = go.transform.rotation.eulerAngles.y;
+			var j_rot = Mathf.Round(go.transform.rotation.eulerAngles.y);
 			var json_cube = "{\"x\":"+j_x+", \"y\":"+j_y+", \"z\":"+j_z+", \"typ\":\""+j_typ+"\", \"rot\":"+j_rot+"}";
 			
 			//Add comma, except the last one 
