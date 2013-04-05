@@ -119,7 +119,7 @@ public class toucher : MonoBehaviour {
 		}
 		
 		//ignore touch on cube rotation gui element
-		if (cube_active){
+		if (cube_active & (active_cube!=null)){
 			float cx = camera.WorldToScreenPoint(active_cube.transform.position).x;
 			float cy = camera.WorldToScreenPoint(active_cube.transform.position).y;
 			//Right left
@@ -147,7 +147,7 @@ public class toucher : MonoBehaviour {
 		RaycastHit hit;
 		if(Physics.Raycast(ray, out hit, Mathf.Infinity)){
 			if (hit.collider.gameObject.tag=="cuboro-cube"){
-				//check if another cube is obove
+				//check for cube
 				Vector3 position = new Vector3(hit.collider.gameObject.transform.position.x, hit.collider.gameObject.transform.position.y+1.0f, hit.collider.gameObject.transform.position.z);
 				GameObject[] objs = GameObject.FindGameObjectsWithTag("cuboro-cube");
 				bool found = false;
@@ -182,7 +182,7 @@ public class toucher : MonoBehaviour {
 				}
 			}			
 		}else{
-			//Move camera (din't hit any objects)
+			//Move camera (dind't hit any objects)
 			dragging_camera=true;
 			cube_active=false;
 			if (active_cube!=null){
@@ -214,10 +214,9 @@ public class toucher : MonoBehaviour {
 					}
 					
 					//create new cube in scene
-					Instantiate(new_cube_typ, new Vector3(hit.point.x, 0.5f, hit.point.z), Quaternion.identity);
+					MoveCube(hit.point, new_cube_typ);
 					new_cube_get_placed=false;
-					detect_camera_or_cube(draginfo.pos);
-					
+					//detect_camera_or_cube(draginfo.pos);
 					c_ammount_of_cubes++;
 					update_ammount(new_cube_typ, true);
 				}
@@ -229,7 +228,7 @@ public class toucher : MonoBehaviour {
 			Ray ray = Camera.main.ScreenPointToRay(draginfo.pos);
 			RaycastHit hit;
 			if(Physics.Raycast(ray, out hit, Mathf.Infinity)){
-				MoveCube(hit.point);
+				MoveCube(hit.point, null);
 			}
 		}
 		
@@ -239,7 +238,7 @@ public class toucher : MonoBehaviour {
 		}
 	}
 		
-	void MoveCube(Vector3 point){
+	void MoveCube(Vector3 point, Transform cube_typ){
 		//This function moves a selected cube arround in the scene.
 		
 		//round coordinates -> Cube gets into grid
@@ -271,17 +270,38 @@ public class toucher : MonoBehaviour {
 			exit=exit+1;
 		}
 		
-		if (new_cube_y>4.5f){
+		if (new_cube_y>4.5f | new_cube_x>3 | new_cube_z>3){
 			return;
 		}
+		
 		//move cube
-		active_cube.transform.position=new Vector3(new_cube_x, new_cube_y, new_cube_z);
+		if (cube_typ==null){
+			if (active_cube!=null){
+				active_cube.transform.position=new Vector3(new_cube_x, new_cube_y, new_cube_z);
+			}
+		}else{
+			Instantiate(cube_typ, new Vector3(new_cube_x, new_cube_y, new_cube_z), Quaternion.identity);
+			//find created cube
+			GameObject[] objs = GameObject.FindGameObjectsWithTag("cuboro-cube");
+			foreach (GameObject go in objs) {
+				CubeBehavior CB = (CubeBehavior) go.GetComponent(typeof(CubeBehavior));
+				if (CB.number==-1){
+					//we found the instantated cube
+					active_cube=go;
+					cube_active=true;
+					go.renderer.material=active_cube_material;
+					//reset the number in cube
+					CB.number=1;
+				}
+			}
+		}
 	}
 	
 	public void remove_cube(){
 		update_ammount(active_cube.gameObject.transform, false);
 		Destroy(active_cube.gameObject);
 		cube_active=false;
+		active_cube=null;
 		c_ammount_of_cubes--;
 	}
 	

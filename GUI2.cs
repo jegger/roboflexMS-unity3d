@@ -171,24 +171,23 @@ public class GUI2 : MonoBehaviour {
 			GUILayout.EndVertical();
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
+		}
+		
+		//Additional Buttons (only visible when some cube is active / selected)
+		if (cube_active & (active_cube!=null)){
+			float x = camera.WorldToScreenPoint(active_cube.transform.position).x;
+			float y = Screen.height-camera.WorldToScreenPoint(active_cube.transform.position).y;
 			
-			
-			//Additional Buttons (only visible when some cube is active / selected)
-			if (cube_active){
-				float x = camera.WorldToScreenPoint(active_cube.transform.position).x;
-				float y = Screen.height-camera.WorldToScreenPoint(active_cube.transform.position).y;
-				
-				if(GUI.Button(new Rect(x-15,y-50,30,30), "X")) {
-					if (active_cube!=null){
-						TOucher.remove_cube();
-					}
+			if(GUI.Button(new Rect(x-15,y-50,30,30), "X")) {
+				if (active_cube!=null){
+					TOucher.remove_cube();
 				}
-				if(GUI.Button(new Rect(x,y,50,30), "->")) {
-					active_cube.transform.Rotate(Vector3.up * -90);
-				}
-				if(GUI.Button(new Rect(x-50,y,50,30), "<-")) {
-					active_cube.transform.Rotate(Vector3.up * +90);
-				}
+			}
+			if(GUI.Button(new Rect(x,y,50,30), "->")) {
+				active_cube.transform.Rotate(Vector3.up * -90);
+			}
+			if(GUI.Button(new Rect(x-50,y,50,30), "<-")) {
+				active_cube.transform.Rotate(Vector3.up * +90);
 			}
 		}
 		
