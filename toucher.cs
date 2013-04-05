@@ -270,7 +270,7 @@ public class toucher : MonoBehaviour {
 			exit=exit+1;
 		}
 		
-		if (new_cube_y>4.5f | new_cube_x>3 | new_cube_z>3){
+		if (new_cube_y>4.5f | new_cube_x>4 | new_cube_z>2){
 			return;
 		}
 		
@@ -297,12 +297,23 @@ public class toucher : MonoBehaviour {
 		}
 	}
 	
+	//removes the selected cube
 	public void remove_cube(){
 		update_ammount(active_cube.gameObject.transform, false);
 		Destroy(active_cube.gameObject);
 		cube_active=false;
 		active_cube=null;
 		c_ammount_of_cubes--;
+	}
+	
+	//remove all cubes from stage
+	public void clear_stage(){
+		GameObject[] objs = GameObject.FindGameObjectsWithTag("cuboro-cube");
+		foreach (GameObject go in objs) {
+			cube_active=true;
+			active_cube=go;
+			remove_cube();
+		}
 	}
 	
 	void update_ammount(Transform go, bool up){

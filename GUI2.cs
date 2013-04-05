@@ -168,6 +168,10 @@ public class GUI2 : MonoBehaviour {
 				WEbrequest.send_cubes();
 			}
 			
+			if(GUILayout.Button("Clear \n all")) {
+				TOucher.clear_stage();
+			}
+			
 			GUILayout.EndVertical();
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
