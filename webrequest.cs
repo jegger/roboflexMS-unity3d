@@ -37,6 +37,10 @@ public class webrequest : MonoBehaviour{
 		//Loop trough cubes
 		var i = 0;
 		foreach (GameObject go in objs) {
+			//Get cube typ
+			CubeBehavior CB = (CubeBehavior) go.GetComponent(typeof(CubeBehavior));
+			int typ = CB.typ;
+			
 			//count i up
 			i=i+1;
 			
@@ -44,7 +48,7 @@ public class webrequest : MonoBehaviour{
 			var j_x = go.transform.position.x;
 			var j_y = go.transform.position.y-0.5;
 			var j_z = go.transform.position.z;
-			var j_typ = go.name;
+			var j_typ = typ;
 			var j_rot = go.transform.rotation.eulerAngles.y;
 			var json_cube = "{\"x\":"+j_x+", \"y\":"+j_y+", \"z\":"+j_z+", \"typ\":\""+j_typ+"\", \"rot\":"+j_rot+"}";
 			

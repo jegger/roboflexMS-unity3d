@@ -46,6 +46,8 @@ public class GUI2 : MonoBehaviour {
 	
 	private bool cube_active=false;
 	private GameObject active_cube;
+	private bool new_cube_get_placed;
+	private Transform new_cube_typ;
 	
 	private bool cube_selection_is_open = false;
 	
@@ -62,7 +64,10 @@ public class GUI2 : MonoBehaviour {
 		//Read valies from other files
 		cube_active= TOucher.cube_active;
 		active_cube= TOucher.active_cube;
+		new_cube_typ = TOucher.new_cube_typ;
+		new_cube_get_placed = TOucher.new_cube_get_placed;
 		
+		//GUI Creation
 		if (cube_selection_is_open==false){
 			//Cube selection menu is closed
 			//Display only one button			
@@ -87,40 +92,49 @@ public class GUI2 : MonoBehaviour {
 			GUILayout.BeginArea (new Rect (0,0,100,Screen.height));
 			GUILayout.BeginHorizontal();
 			GUILayout.BeginVertical();
-			if (GUILayout.Button(typ1, cube_style)) {
-				Instantiate(cube1, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ1, cube_style)) {
+				new_cube_typ=cube1;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ2, cube_style)) {
-				Instantiate(cube2, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ2, cube_style)) {
+				new_cube_typ=cube2;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ3, cube_style)) {
-				Instantiate(cube3, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ3, cube_style)) {
+				new_cube_typ=cube3;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ4, cube_style)) {
-				Instantiate(cube4, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ4, cube_style)) {
+				new_cube_typ=cube4;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ5, cube_style)) {
-				Instantiate(cube5, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ5, cube_style)) {
+				new_cube_typ=cube5;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ6, cube_style)) {
-				Instantiate(cube6, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ6, cube_style)) {
+				new_cube_typ=cube6;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ7, cube_style)) {
-				Instantiate(cube7, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ7, cube_style)) {
+				new_cube_typ=cube7;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ8, cube_style)) {
-				Instantiate(cube8, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ8, cube_style)) {
+				new_cube_typ=cube8;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ9, cube_style)) {
-				Instantiate(cube9, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ9, cube_style)) {
+				new_cube_typ=cube9;
+				new_cube_get_placed=true;
 			}
 			GUILayout.EndVertical();
 			GUILayout.EndHorizontal();
@@ -130,20 +144,28 @@ public class GUI2 : MonoBehaviour {
 			GUILayout.BeginArea (new Rect (Screen.width-100,0,100,Screen.height));
 			GUILayout.BeginHorizontal();
 			GUILayout.BeginVertical();
-			if (GUILayout.Button(typ10, cube_style)) {
-				Instantiate(cube10, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ10, cube_style)) {
+				new_cube_typ=cube10;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ11, cube_style)) {
-				Instantiate(cube11, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ11, cube_style)) {
+				new_cube_typ=cube11;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ12, cube_style)) {
-				Instantiate(cube12, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ12, cube_style)) {
+				new_cube_typ=cube12;
+				new_cube_get_placed=true;
 			}
 			
-			if (GUILayout.Button(typ13, cube_style)) {
-				Instantiate(cube13, new Vector3(0, 0.5f, 0), Quaternion.identity);
+			if (GUILayout.RepeatButton(typ13, cube_style)) {
+				new_cube_typ=cube13;
+				new_cube_get_placed=true;
+			}
+			
+			if(GUILayout.Button("Send \n cubes")) {
+				WEbrequest.send_cubes();
 			}
 			
 			GUILayout.EndVertical();
@@ -153,23 +175,26 @@ public class GUI2 : MonoBehaviour {
 			
 			//Additional Buttons (only visible when some cube is active / selected)
 			if (cube_active){
-				if(GUI.Button(new Rect(Screen.width-50,Screen.height-80,50,65), "Delete")) {
+				float x = camera.WorldToScreenPoint(active_cube.transform.position).x;
+				float y = Screen.height-camera.WorldToScreenPoint(active_cube.transform.position).y;
+				
+				if(GUI.Button(new Rect(x-15,y-50,30,30), "X")) {
 					if (active_cube!=null){
-						Destroy(active_cube.gameObject);
-						TOucher.cube_active=false;
+						TOucher.remove_cube();
 					}
 				}
-				if(GUI.Button(new Rect(Screen.width-100,Screen.height-80,50,65), "Send-cubes")) {
-					if (active_cube!=null){
-						WEbrequest.send_cubes();
-					}
-				}
-				Debug.Log(camera.WorldToScreenPoint(active_cube.transform.position));
-				if(GUI.Button(new Rect(camera.WorldToScreenPoint(active_cube.transform.position).x,Screen.height-camera.WorldToScreenPoint(active_cube.transform.position).y,50,20), "->")) {
+				if(GUI.Button(new Rect(x,y,50,30), "->")) {
 					active_cube.transform.Rotate(Vector3.up * -90);
+				}
+				if(GUI.Button(new Rect(x-50,y,50,30), "<-")) {
+					active_cube.transform.Rotate(Vector3.up * +90);
 				}
 			}
 		}
+		
+		//Set external variables
 		TOucher.cube_selection_is_open=cube_selection_is_open;
+		TOucher.new_cube_typ=new_cube_typ;
+		TOucher.new_cube_get_placed=new_cube_get_placed;
 	}
 }

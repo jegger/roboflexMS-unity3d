@@ -5,15 +5,48 @@ public class toucher : MonoBehaviour {
 	
 	//Publics
 	public float camera_speed=3f;
+	public int ammount_of_cubes=15;
+	
 	public Material active_cube_material;
 	public Material normal_cube_material;
 	
 	//Privates for inspector
 	[System.NonSerialized] public bool cube_active=false;
-	[System.NonSerialized] public GameObject active_cube;
+	[System.NonSerialized] public GameObject active_cube=null;
 	[System.NonSerialized] public bool cube_selection_is_open = false;
+	[System.NonSerialized] public Transform new_cube_typ;
+	[System.NonSerialized] public bool new_cube_get_placed;
 	
 	//Privates
+	private int c_ammount_typ1; //current ammount of cubes in the scene
+	private int c_ammount_typ2;
+	private int c_ammount_typ3;
+	private int c_ammount_typ4;
+	private int c_ammount_typ5;
+	private int c_ammount_typ6;
+	private int c_ammount_typ7;
+	private int c_ammount_typ8;
+	private int c_ammount_typ9;
+	private int c_ammount_typ10;
+	private int c_ammount_typ11;
+	private int c_ammount_typ12;
+	private int c_ammount_typ13;
+	private int c_ammount_of_cubes;
+	
+	private int ammount_typ1=46;
+	private int ammount_typ2=4;
+	private int ammount_typ3=7;
+	private int ammount_typ4=2;
+	private int ammount_typ5=4;
+	private int ammount_typ6=4;
+	private int ammount_typ7=6;
+	private int ammount_typ8=6;
+	private int ammount_typ9=4;
+	private int ammount_typ10=4;
+	private int ammount_typ11=12;
+	private int ammount_typ12=5;
+	private int ammount_typ13=2;
+	
 	private float new_cube_x;
 	private float new_cube_y;
 	private float new_cube_z;
@@ -77,14 +110,29 @@ public class toucher : MonoBehaviour {
 		
 		//ignore touch on cube rotation gui element
 		if (cube_active){
-			if (touch.y<camera.WorldToScreenPoint(active_cube.transform.position).y & touch.x>camera.WorldToScreenPoint(active_cube.transform.position).x){
-				if (touch.y>camera.WorldToScreenPoint(active_cube.transform.position).y-20 & touch.x<camera.WorldToScreenPoint(active_cube.transform.position).x+50){
+			float cx = camera.WorldToScreenPoint(active_cube.transform.position).x;
+			float cy = camera.WorldToScreenPoint(active_cube.transform.position).y;
+			//Right left
+			if (touch.x>cx-50 & touch.x<cx+50){
+				if (touch.y>cy-30 & touch.y<cy){
+					return;
+				}
+			}
+			//delete
+			if (touch.x>cx-15 & touch.x<cx+15){
+				if (touch.y>cy+30 & touch.y<cy+60){
 					return;
 				}
 			}
 		}
 		
-		//Create raycasts
+		//detect if touch is on camera or cube
+		detect_camera_or_cube(touch);
+	}
+	
+	
+	void detect_camera_or_cube(Vector2 touch){
+		//Create raycasts to detect if touch is over cube
 		Ray ray = Camera.main.ScreenPointToRay(touch);
 		RaycastHit hit;
 		if(Physics.Raycast(ray, out hit, Mathf.Infinity)){
@@ -131,9 +179,8 @@ public class toucher : MonoBehaviour {
 				active_cube.renderer.material=normal_cube_material;
 			}
 			active_cube=null;
-		}
+		}	
 	}
-	
 	
 	void onPinch(PinchInfo pinfo){
 		//This function get called when a pinch is done on the screen -> zoom
@@ -141,18 +188,43 @@ public class toucher : MonoBehaviour {
 	}
 	
 	
-	void OnDrag(DragInfo draginfo){	
+	void OnDrag(DragInfo draginfo){
 		//This function get called whenever a touch get draged on the screen.
+		
+		//Check if a new cube gets placed in the scene
+		if (new_cube_get_placed){
+			if (draginfo.pos.x>100 & draginfo.pos.x<Screen.width-100){
+				Ray ray = Camera.main.ScreenPointToRay(draginfo.pos);
+				RaycastHit hit;
+				if(Physics.Raycast(ray, out hit, Mathf.Infinity)){
+					//if the max of cubes is reached, dont create cube
+					if (c_ammount_of_cubes>=ammount_of_cubes | is_max_of_ammount_reached(new_cube_typ)){
+						new_cube_get_placed=false;
+						return;
+					}
+					
+					//create new cube in scene
+					Instantiate(new_cube_typ, new Vector3(hit.point.x, 0.5f, hit.point.z), Quaternion.identity);
+					new_cube_get_placed=false;
+					detect_camera_or_cube(draginfo.pos);
+					
+					c_ammount_of_cubes++;
+					update_ammount(new_cube_typ, true);
+				}
+			}
+		}
+		
+		//Check if cube gets draged
 		if (cube_active & dragging_camera==false){
-			//Cube dragging
 			Ray ray = Camera.main.ScreenPointToRay(draginfo.pos);
 			RaycastHit hit;
 			if(Physics.Raycast(ray, out hit, Mathf.Infinity)){
 				MoveCube(hit.point);
 			}
 		}
+		
+		//Check if camera get rotated
 		if (dragging_camera){
-			//camera rotating
 			Camera.mainCamera.transform.RotateAround(Vector3.zero, Vector3.up, draginfo.delta.x/10);
 		}
 	}
@@ -189,7 +261,60 @@ public class toucher : MonoBehaviour {
 			exit=exit+1;
 		}
 		
+		if (new_cube_y>4.5f){
+			return;
+		}
 		//move cube
 		active_cube.transform.position=new Vector3(new_cube_x, new_cube_y, new_cube_z);
+	}
+	
+	public void remove_cube(){
+		update_ammount(active_cube.gameObject.transform, false);
+		Destroy(active_cube.gameObject);
+		cube_active=false;
+		c_ammount_of_cubes--;
+	}
+	
+	void update_ammount(Transform go, bool up){
+		//Get cube typ
+		CubeBehavior CB = (CubeBehavior) new_cube_typ.GetComponent(typeof(CubeBehavior));
+		int typ = CB.typ;
+		
+		//Update correct typ
+		if (typ==1){if (up){c_ammount_typ1++;}else{c_ammount_typ1--;};}
+		if (typ==2){if (up){c_ammount_typ2++;}else{c_ammount_typ2--;};}
+		if (typ==3){if (up){c_ammount_typ3++;}else{c_ammount_typ3--;};}
+		if (typ==4){if (up){c_ammount_typ4++;}else{c_ammount_typ4--;};}
+		if (typ==5){if (up){c_ammount_typ5++;}else{c_ammount_typ5--;};}
+		if (typ==6){if (up){c_ammount_typ6++;}else{c_ammount_typ6--;};}
+		if (typ==7){if (up){c_ammount_typ7++;}else{c_ammount_typ7--;};}
+		if (typ==8){if (up){c_ammount_typ8++;}else{c_ammount_typ8--;};}
+		if (typ==9){if (up){c_ammount_typ9++;}else{c_ammount_typ9--;};}
+		if (typ==10){if (up){c_ammount_typ10++;}else{c_ammount_typ10--;};}
+		if (typ==11){if (up){c_ammount_typ11++;}else{c_ammount_typ11--;};}
+		if (typ==12){if (up){c_ammount_typ12++;}else{c_ammount_typ12--;};}
+		if (typ==13){if (up){c_ammount_typ13++;}else{c_ammount_typ13--;};}
+	}
+	
+	bool is_max_of_ammount_reached(Transform go){
+		//Get cube typ
+		CubeBehavior CB = (CubeBehavior) new_cube_typ.GetComponent(typeof(CubeBehavior));
+		int typ = CB.typ;
+				
+		//Check ammount
+		if (typ==1){if (c_ammount_typ1<ammount_typ1){return false;}else{return true;}}
+		if (typ==2){if (c_ammount_typ2<ammount_typ2){return false;}else{return true;}}
+		if (typ==3){if (c_ammount_typ3<ammount_typ3){return false;}else{return true;}}
+		if (typ==4){if (c_ammount_typ4<ammount_typ4){return false;}else{return true;}}
+		if (typ==5){if (c_ammount_typ5<ammount_typ5){return false;}else{return true;}}
+		if (typ==6){if (c_ammount_typ6<ammount_typ6){return false;}else{return true;}}
+		if (typ==7){if (c_ammount_typ7<ammount_typ7){return false;}else{return true;}}
+		if (typ==8){if (c_ammount_typ8<ammount_typ8){return false;}else{return true;}}
+		if (typ==9){if (c_ammount_typ9<ammount_typ9){return false;}else{return true;}}
+		if (typ==10){if (c_ammount_typ10<ammount_typ10){return false;}else{return true;}}
+		if (typ==11){if (c_ammount_typ11<ammount_typ11){return false;}else{return true;}}
+		if (typ==12){if (c_ammount_typ12<ammount_typ12){return false;}else{return true;}}
+		if (typ==13){if (c_ammount_typ13<ammount_typ13){return false;}else{return true;}}
+		return false;
 	}
 } 
