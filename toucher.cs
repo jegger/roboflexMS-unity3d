@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class toucher : MonoBehaviour {
 	
@@ -16,6 +17,7 @@ public class toucher : MonoBehaviour {
 	[System.NonSerialized] public bool cube_selection_is_open = false;
 	[System.NonSerialized] public Transform new_cube_typ;
 	[System.NonSerialized] public bool new_cube_get_placed;
+	[System.NonSerialized] public bool popup_opened = false;
 	
 	//Privates
 	private int c_ammount_typ1; //current ammount of cubes in the scene
@@ -97,6 +99,12 @@ public class toucher : MonoBehaviour {
 	void OnTouchDown(Vector2 touch){
 		//This function get called whenever a touch recives the screeen
 		
+		//Ignore touch if some popup is open
+		if (popup_opened){
+			return;	
+		}
+		
+		
 		//ignore touches on GUI elements
 		if (cube_selection_is_open==false){
 			if (touch.x<Screen.width-20 & touch.x>Screen.width-170 & touch.y>Screen.height-70 & touch.y<Screen.height-20){
@@ -162,9 +170,7 @@ public class toucher : MonoBehaviour {
 					if (active_cube!=hit.collider.gameObject){
 						//we touched another cube than before
 						if (cube_active){
-							if (active_cube!=null){
-								active_cube.renderer.material=normal_cube_material;
-							}
+							deselct_active_cube();
 						}
 						hit.collider.gameObject.renderer.material=active_cube_material;
 					}
@@ -175,9 +181,7 @@ public class toucher : MonoBehaviour {
 				if (hit.collider.gameObject.tag=="ground"){
 					dragging_camera=true;
 					cube_active=false;
-					if (active_cube!=null){
-						active_cube.renderer.material=normal_cube_material;
-					}
+					deselct_active_cube();
 					active_cube=null;
 				}
 			}			
@@ -185,11 +189,15 @@ public class toucher : MonoBehaviour {
 			//Move camera (dind't hit any objects)
 			dragging_camera=true;
 			cube_active=false;
-			if (active_cube!=null){
-				active_cube.renderer.material=normal_cube_material;
-			}
+			deselct_active_cube();
 			active_cube=null;
 		}	
+	}
+	
+	public void deselct_active_cube(){
+		if (active_cube!=null){
+			active_cube.renderer.material=normal_cube_material;
+		}
 	}
 	
 	void onPinch(PinchInfo pinfo){
@@ -200,6 +208,13 @@ public class toucher : MonoBehaviour {
 	
 	void OnDrag(DragInfo draginfo){
 		//This function get called whenever a touch get draged on the screen.
+		
+		//Check if popup is open
+		if (popup_opened){
+			new_cube_get_placed=false;
+			new_cube_typ=null;
+			return;	
+		}
 		
 		//Check if a new cube gets placed in the scene
 		if (new_cube_get_placed){
@@ -270,7 +285,7 @@ public class toucher : MonoBehaviour {
 			exit=exit+1;
 		}
 		
-		if (new_cube_y>4.5f | new_cube_x>4 | new_cube_z>2){
+		if (new_cube_y>4.5f | new_cube_x>4 | new_cube_z>2 | new_cube_x<-3 | new_cube_z<-3){
 			return;
 		}
 		
@@ -308,17 +323,18 @@ public class toucher : MonoBehaviour {
 	
 	//remove all cubes from stage
 	public void clear_stage(){
+		int test = 0;
 		GameObject[] objs = GameObject.FindGameObjectsWithTag("cuboro-cube");
 		foreach (GameObject go in objs) {
-			cube_active=true;
-			active_cube=go;
-			remove_cube();
+			update_ammount(go.transform, false);
+			Destroy(go);
+			c_ammount_of_cubes--;
 		}
 	}
 	
 	void update_ammount(Transform go, bool up){
 		//Get cube typ
-		CubeBehavior CB = (CubeBehavior) new_cube_typ.GetComponent(typeof(CubeBehavior));
+		CubeBehavior CB = (CubeBehavior) go.GetComponent(typeof(CubeBehavior));
 		int typ = CB.typ;
 		
 		//Update correct typ
@@ -339,7 +355,7 @@ public class toucher : MonoBehaviour {
 	
 	bool is_max_of_ammount_reached(Transform go){
 		//Get cube typ
-		CubeBehavior CB = (CubeBehavior) new_cube_typ.GetComponent(typeof(CubeBehavior));
+		CubeBehavior CB = (CubeBehavior) go.GetComponent(typeof(CubeBehavior));
 		int typ = CB.typ;
 				
 		//Check ammount

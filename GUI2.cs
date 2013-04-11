@@ -11,6 +11,7 @@ public class GUI2 : MonoBehaviour {
 	public GUIStyle selection_button;
 	public GUIStyle background_style;
 	public GUIStyle cube_style;
+	public GUIStyle popup_style;
 	
 	public Texture typ1;
 	public Texture typ2;
@@ -50,7 +51,7 @@ public class GUI2 : MonoBehaviour {
 	private Transform new_cube_typ;
 	
 	private bool cube_selection_is_open = false;
-	
+	private bool delete_popup_active = false;
 	
 	void Start(){
 		//This function get called when the game starts, 
@@ -169,12 +170,36 @@ public class GUI2 : MonoBehaviour {
 			}
 			
 			if(GUILayout.Button("Clear \n all")) {
-				TOucher.clear_stage();
+				delete_popup_active = true;
+				TOucher.popup_opened = true;
+				TOucher.deselct_active_cube();
+				TOucher.active_cube=null;
+				TOucher.cube_active=false;
 			}
 			
 			GUILayout.EndVertical();
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
+			
+			//Popups ---
+			if (TOucher.popup_opened){
+				//Send cubes
+				
+				
+				// Are shure you delete?
+				if (delete_popup_active){
+					GUI.Box(new Rect(200,200,Screen.width-400,Screen.height-400), "Are you sure, you want to delete all cubes?", popup_style);
+					if(GUI.Button(new Rect((Screen.width/2)+10,Screen.height/2,200,50), "Yes, do the madness")) {
+						TOucher.clear_stage();
+						TOucher.popup_opened = false;
+						delete_popup_active = false;
+					}
+					if(GUI.Button(new Rect((Screen.width/2)-210,Screen.height/2,200,50), "Cancel")) {
+						TOucher.popup_opened = false;
+						delete_popup_active = false;
+					}
+				}
+			}
 		}
 		
 		//Additional Buttons (only visible when some cube is active / selected)
