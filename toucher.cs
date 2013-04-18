@@ -18,6 +18,7 @@ public class toucher : MonoBehaviour {
 	[System.NonSerialized] public Transform new_cube_typ;
 	[System.NonSerialized] public bool new_cube_get_placed;
 	[System.NonSerialized] public bool popup_opened = false;
+	[System.NonSerialized] public int c_ammount_of_cubes;
 	
 	//Privates
 	private int c_ammount_typ1; //current ammount of cubes in the scene
@@ -33,7 +34,6 @@ public class toucher : MonoBehaviour {
 	private int c_ammount_typ11;
 	private int c_ammount_typ12;
 	private int c_ammount_typ13;
-	private int c_ammount_of_cubes;
 	
 	private int ammount_typ1=46;
 	private int ammount_typ2=4;

@@ -177,9 +177,18 @@ public class GUI2 : MonoBehaviour {
 				TOucher.cube_active=false;
 			}
 			
+			if(GUILayout.Button("Build \n Lager")) {
+				WEbrequest.build_bahn(0);
+			}
+			
 			GUILayout.EndVertical();
 			GUILayout.EndHorizontal();
 			GUILayout.EndArea();
+			
+			
+			//Display used cubes
+			GUI.Box(new Rect(Screen.width/2-50,10,100,20), TOucher.c_ammount_of_cubes+" / "+TOucher.ammount_of_cubes+" Cubes");
+			
 			
 			//Popups ---
 			if (TOucher.popup_opened){

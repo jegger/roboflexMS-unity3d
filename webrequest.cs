@@ -14,6 +14,16 @@ public class webrequest : MonoBehaviour{
 		;
 	}
 	
+	
+	public void build_bahn(int number){
+		//This function sends the command to build the lager.
+		string url = "http://192.168.50.236/build_bahn";
+        WWWForm form = new WWWForm();
+        form.AddField("number", number);
+        WWW www = new WWW(url, form);
+        StartCoroutine(WaitForRequest(www));
+	}
+	
 	public void send_cubes(){
 		//This function gets coorindates of the cubes from the scene.
 		//Then it sends it to the server.
